@@ -3,3 +3,78 @@ title: "trisha"
 format: html
 ---
 
+```{r install-pkgs}
+install.packages("tidyverse")
+```
+
+```{r pkgs-libraries}
+#| message: FALSE
+
+library(tidyverse)
+library(readr)
+```
+
+```{r}
+# might take a while, took 1-2 min on my system
+# works on container
+tigercensus_raw <- read_csv('../../2026-ASA-DataFest-Data-Files/tigercensuscodes.csv', show_col_types = FALSE)
+determinants_raw <- read_csv('../../2026-ASA-DataFest-Data-Files/social_determinants.csv', show_col_types = FALSE)
+providers_raw <- read_csv('../../2026-ASA-DataFest-Data-Files/providers.csv', show_col_types = FALSE)
+patients_raw <- read_csv('../../2026-ASA-DataFest-Data-Files/patients.csv', show_col_types = FALSE)
+encounters_raw <- read_csv('../../2026-ASA-DataFest-Data-Files/encounters.csv', show_col_types = FALSE)
+diagnosis_raw <- read_csv('../../2026-ASA-DataFest-Data-Files/diagnosis.csv', show_col_types = FALSE)
+departments_raw <- read_csv('../../2026-ASA-DataFest-Data-Files/departments.csv', show_col_types = FALSE)
+
+```
+
+```{r}
+#| label: departments_cleaning
+
+clean_df <- function(df) {
+  return(df |>
+    janitor::clean_names() |>
+     mutate(across(everything(), \(x) ifelse(str_detect(x, "\\*|Unknown|Unspecified"), NA, x)))
+  )
+}
+
+departments <- clean_df(departments_raw) |>
+  filter(department_key > 0)
+determinants <- clean_df(determinants_raw) 
+encounters <- clean_df(encounters_raw) |>
+  mutate(date = as.Date(date, format = "%m/%d/%y"), visit_type = str_to_title(visit_type))
+diagnosis <- clean_df(diagnosis_raw)
+patients <- clean_df(patients_raw)
+providers <- clean_df(providers_raw) |>
+  mutate(across(-c(durable_key, clinician_title), \(x) str_to_title(x)), 
+         office_address = str_remove_all(office_address,
+                                          "\\."),
+         office_address = str_replace_all(office_address,
+                                          "Ste", "Suite"),
+         office_address = str_replace_all(office_address,
+                                          "St", "Street"),
+         office_address = str_replace_all(office_address, "Rd", "Road"),
+         office_address = str_replace_all(office_address, "Dr", "Drive"),
+         office_address = str_replace_all(office_address,
+                                          "\\b(\\w{1,2})\\b",
+                                          \(x) str_to_upper(x)),
+         office_address = str_replace_all(office_address, "Street", "St"),
+         office_address = str_replace_all(office_address, "Road", "Rd"),
+         office_address = str_replace_all(office_address, "Drive", "Dr"),
+         office_address = str_replace_all(office_address, "Suite", "Ste"),
+         clinician_title = str_remove_all(clinician_title, "\\.")
+         )
+tigercensus <- clean_df(tigercensus_raw)
+```
+
+```{r}
+#| label: export-clean-data
+
+write_csv(departments, "../../Clean-Data/departments.csv")
+write_csv(determinants, "../../Clean-Data/determinants.csv")
+write_csv(diagnosis, "../../Clean-Data/diagnosis.csv")
+write_csv(encounters, "../../Clean-Data/encounters.csv")
+write_csv(patients, "../../Clean-Data/patients.csv")
+write_csv(providers, "../../Clean-Data/providers.csv")
+write_csv(tigercensus, "../../Clean-Data/tigercensus.csv")
+```
+
