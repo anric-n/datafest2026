@@ -30,3 +30,23 @@ departments<- read_csv('~/data/2026-ASA-DataFest-Data-Files/departments.csv',sho
 
 ```
 
+```{r}
+#| label: departments_cleaning
+
+clean_df <- function(df) {
+  return(df |>
+    janitor::clean_names() |>
+     mutate(across(everything(), \(x) ifelse(str_detect(x, "\\*|Unknown|Unspecified"), NA, x)))
+  )
+}
+
+departments <- clean_df(departments_raw) |>
+  filter(department_key > 0)
+determinants <- clean_df(determinants_raw) 
+encounters <- clean_df(encounters_raw) |>
+  mutate(date = as.Date(date, format = "%m/%d/%y"), visit_type = str_to_title(visit_type))
+diagnosis <- clean_df(diagnosis_raw)
+patients <- clean_df(patients_raw)
+providers <- clean_df(providers_raw) 
+tigercensus <- clean_df(tigercensus_raw)
+```
