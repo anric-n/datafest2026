@@ -2,4 +2,47 @@
 title: "anric"
 format: html
 ---
+```{r}
+
+patients |> summarise(across(everything(), ~ sum(is.na(.)))) |>
+  pivot_longer(everything(), names_to = "column", values_to = "count") |>
+  arrange(desc(count)) |>
+  kable()
+```
+
+```{r patients-cols}
+names(patients)
+```
+
+```{r patients-vis}
+ggplot(patients, aes(x = first_race, fill = first_race)) +
+  geom_bar() +
+  scale_y_log10() 
+
+ggplot(patients, aes(x = "", fill = first_race)) +
+  geom_bar(position = "fill")
+ggplot(patients, aes(x = "", fill = vital_status)) +
+  geom_bar(position = "fill")
+
+```
+
+```{r}
+block_group <- patients |>
+  count(census_block_group_fips_code)
+```
+```{r}
+unique(patients$my_chart_status)
+patients |>
+  filter(is.na(patients$my_chart_status))
+```
+
+```{r}
+dead_patients <- patients |>
+  filter(vital_status == "Deceased")
+unique(dead_patients$patient_birth_year_bin)
+
+ggplot(dead_patients, aes(x = patient_birth_year_bin)) +
+  geom_bar() +
+  scale_y_log10()
+```
 
