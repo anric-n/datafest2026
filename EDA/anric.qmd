@@ -1,10 +1,20 @@
 ---
 title: "anric"
 format: html
+editor_options: 
+  chunk_output_type: console
 ---
 ```{r}
 
 patients |> summarise(across(everything(), ~ sum(is.na(.)))) |>
+  pivot_longer(everything(), names_to = "column", values_to = "count") |>
+  arrange(desc(count)) |>
+  kable()
+```
+
+```{r}
+
+diagnosis |> summarise(across(everything(), ~ sum(is.na(.)))) |>
   pivot_longer(everything(), names_to = "column", values_to = "count") |>
   arrange(desc(count)) |>
   kable()
@@ -36,6 +46,126 @@ patients |>
   filter(is.na(patients$my_chart_status))
 ```
 
+
+```{r}
+head(encounters, n = 10)
+```
+
+
+```{r}
+encounters_patients <- left_join(encounters, patients,
+  by = join_by(patient_durable_key == durable_key))
+```
+
+
+```{r}
+virtual <- encounters_patients |>
+  filter(visit_type_description == "Clinic Visits- Virtual" 
+         | visit_type_description == "Virtual Visits"
+    | visit_type_description == "Clinic Visit- Virtual") 
+
+virtual_patients <- virtual |>
+  select(
+    patient_durable_key, census_block_group_fips_code:patient_birth_year_bin) |>
+  distinct()
+
+```
+
+```{r}
+virtual_patients |>
+  filter(is.na(census_block_group_fips_code)) |>
+  distinct()
+```
+
+
+```{r}
+virtual_diagnosis <- virtual |> 
+  left_join(diagnosis, by = join_by(primary_diagnosis_key == diagnosis_key))
+```
+
+
+# patient demographics:
+
+Racial: The vast majority of virtual appointments are made by White patients. 
+There is also a much smaller proportion of NAs in the virtual data, and the 
+proprtions of each racial minority relative to each other are relativly similar
+between the two datasets. When visualized, it almost looks like the vast majority
+of the NA's were 'converted' to 
+```{r}
+race_patients <- patients |>
+  group_by(first_race) |>
+  summarise(
+    count = n(),
+    proportion = n() / nrow(patients),
+    .groups = "drop"
+  )
+race_patients <- virtual_patients |>
+  group_by(first_race) |>
+  summarise(
+    count = n(),
+    proportion = n() / nrow(virtual_patients),
+    .groups = "drop"
+  ) |>
+  rename(
+    virtual_count = count,
+    virtual_proportion = proportion
+  ) |>
+  left_join(race_patients, by = join_by(first_race))
+```
+
+```{r patients-vis}
+ggplot(virtual_patients, aes(x = first_race, fill = first_race)) +
+  geom_bar()
+
+ggplot(patients, aes(x = first_race, fill = first_race)) +
+  geom_bar() 
+ggplot(virtual_patients, aes(x = "", fill = first_race)) +
+  geom_bar(position = "fill")
+
+ggplot(patients, aes(x = "", fill = first_race)) +
+  geom_bar(position = "fill")
+
+```
+
+Legacy code:
+```{r}
+
+dead_encounters |> summarise(across(everything(), ~ sum(is.na(.)))) |>
+  pivot_longer(everything(), names_to = "column", values_to = "count") |>
+  arrange(desc(count)) |>
+  kable()
+
+```
+
+
+
+```{r}
+diagnosis |> count(group_name)
+diagnosis |> count(diagnosis_key) |> arrange(desc(n))
+
+# Step 1 & 2: Count distinct B per A
+diagnosis_conflict <- diagnosis |>
+  group_by(diagnosis_key) |>
+  summarise(
+    n_B = n_distinct(group_name),          # number of unique B values
+    B_values = list(unique(group_name)),   # actual B values
+    .groups = "drop"
+  ) |>
+  filter(n_B > 1)
+
+# View result
+diagnosis_conflict
+```
+
+
+```{r}
+#dead_encounters <- inner_join(encounters, dead_patients, by = join_by(patient_durable_key == durable_key)) |>
+  inner_join(diagnosis, join_by(diagnosis))
+
+```
+
+
+
 ```{r}
 dead_patients <- patients |>
   filter(vital_status == "Deceased")
@@ -45,4 +175,3 @@ ggplot(dead_patients, aes(x = patient_birth_year_bin)) +
   geom_bar() +
   scale_y_log10()
 ```
-
