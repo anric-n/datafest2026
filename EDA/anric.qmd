@@ -70,6 +70,12 @@ virtual_patients <- virtual |>
   distinct()
 
 ```
+```{r}
+virtual_patients |>
+  filter(is.na(patients$my_chart_status))
+```
+
+
 
 ```{r}
 virtual_patients |>
@@ -79,10 +85,38 @@ virtual_patients |>
 
 
 ```{r}
-virtual_diagnosis <- virtual |> 
-  left_join(diagnosis, by = join_by(primary_diagnosis_key == diagnosis_key))
+virtual_diagnosis <- semi_join(diagnosis, virtual, by = c("diagnosis_key" = "primary_diagnosis_key"))
 ```
 
+```{r}
+
+virtual |> summarise(across(everything(), ~ sum(is.na(.)))) |>
+  pivot_longer(everything(), names_to = "column", values_to = "count") |>
+  arrange(desc(count)) |>
+  kable()
+```
+
+```{r}
+diagnosis_conflict <- virtual_diagnosis |>
+  group_by(diagnosis_key) |>
+  summarise(
+    n_B = n_distinct(group_name),          # number of unique B values
+    B_values = list(unique(group_name)),   # actual B values
+    .groups = "drop"
+  ) |>
+  filter(n_B > 1)
+
+# View result
+
+```
+
+```{r}
+virtual <- virtual |>
+  left_join(virtual_diagnosis, 
+    by = join_by("diagnosis_key" = "primary_diagnosis_key"),
+    
+  )
+```
 
 # patient demographics:
 
@@ -127,7 +161,94 @@ ggplot(patients, aes(x = "", fill = first_race)) +
 
 ```
 
-Legacy code:
+
+group names:
+
+```{r}
+# isolate diagnosis keys from virtual
+# isolate diagnosis keys and group names from diagnosis
+# join
+
+virtual_slice <- virtual |> select(primary_diagnosis_key)
+virtual_diag_slice <- virtual_diagnosis |> select(diagnosis_key, group_name) |> distinct()
+
+virtual_diagnosis_stats <- left_join(virtual_slice, virtual_diag_slice, 
+  by = c("primary_diagnosis_key" = "diagnosis_key"),
+  relationship = "many-to-many", multiple = "all")
+
+
+virtual_group_name_stat <- count(virtual_diagnosis_stats, group_name) |>
+  rename(virtual_count = n)
+
+
+
+```
+
+
+# diagnosis
+some diagnosis groups that are most commonnly virtual include general visits 
+(no issues), eating disorders, obesity / weight management, and pregnancy management.
+Some diagnosis gorups that are almost never virtual include NA,
+(arthritis, bone fractures, mamograams, labor, wounds, etc). 
+```{r}
+# isolate diagnosis keys from virtual
+# isolate diagnosis keys and group names from diagnosis
+# join
+
+encounter_slice <- encounters |> select(primary_diagnosis_key)
+diag_slice <- diagnosis |> select(diagnosis_key, group_name) |> distinct()
+
+diagnosis_stats <- left_join(encounter_slice, diag_slice, 
+  by = c("primary_diagnosis_key" = "diagnosis_key"),
+  relationship = "many-to-many", multiple = "all")
+
+
+group_name_stat <- count(diagnosis_stats, group_name) |>
+  left_join(virtual_group_name_stat, by = join_by(group_name)) |>
+  rename(virtual_count = n.y, count = n.x) |>
+  mutate(proportion = virtual_count * 100 / count)
+
+
+```
+
+# age
+older patients are more likely to have virtual appointments?
+```{r patients-vis}
+ggplot(virtual_patients, aes(x = patient_birth_year_bin)) +
+  geom_histogram() + 
+  labs(title = "virtual patients")
+
+ggplot(patients, aes(x = patient_birth_year_bin)) +
+  geom_histogram() +
+    labs(title = "All patients")
+
+
+```
+
+
+```{r}
+
+combined_data <- bind_rows(
+  virtual_patients %>% mutate(group = "virtual_patients"),
+  patients        %>% mutate(group = "all_patients")
+)
+
+age_summary <- combined_data %>%
+  group_by(group, patient_birth_year_bin) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(group, patient_birth_year_bin)
+age_summary <- age_summary %>%
+  pivot_wider(
+    names_from  = group,
+    values_from = count,
+    values_fill = 0
+  ) |>
+  mutate(prop = virtual_patients / all_patients )
+```
+
+
+
+# Legacy code:
 ```{r}
 
 dead_encounters |> summarise(across(everything(), ~ sum(is.na(.)))) |>
@@ -137,25 +258,6 @@ dead_encounters |> summarise(across(everything(), ~ sum(is.na(.)))) |>
 
 ```
 
-
-
-```{r}
-diagnosis |> count(group_name)
-diagnosis |> count(diagnosis_key) |> arrange(desc(n))
-
-# Step 1 & 2: Count distinct B per A
-diagnosis_conflict <- diagnosis |>
-  group_by(diagnosis_key) |>
-  summarise(
-    n_B = n_distinct(group_name),          # number of unique B values
-    B_values = list(unique(group_name)),   # actual B values
-    .groups = "drop"
-  ) |>
-  filter(n_B > 1)
-
-# View result
-diagnosis_conflict
-```
 
 
 ```{r}
