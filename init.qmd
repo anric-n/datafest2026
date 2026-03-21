@@ -12,7 +12,8 @@ install.packages("tidyverse")
 
 ```{r pkgs-libraries}
 #| message: FALSE
-
+library(tidycensus)
+library(tigris)
 library(tidyverse)
 library(readr)
 ```
@@ -89,10 +90,10 @@ tigercensus <- read_csv("../Clean-Data/tigercensus.csv")
 ```{r}
 ks_income_tract <- get_acs(
   geography = "tract",   # Choose county as our geographic unit
+  geometry = TRUE,
   variables = "B19013_001", 
   state = "KS",         
-  year = 2022,
-  geometry = TRUE)
+  year = 2022,)
 
 ks_income_tract <- ks_income_tract |> 
   mutate(
