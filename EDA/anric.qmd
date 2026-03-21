@@ -10,6 +10,14 @@ patients |> summarise(across(everything(), ~ sum(is.na(.)))) |>
   kable()
 ```
 
+```{r}
+
+diagnosis |> summarise(across(everything(), ~ sum(is.na(.)))) |>
+  pivot_longer(everything(), names_to = "column", values_to = "count") |>
+  arrange(desc(count)) |>
+  kable()
+```
+
 ```{r patients-cols}
 names(patients)
 ```
@@ -52,8 +60,13 @@ head(encounters, n = 10)
 ```
 
 ```{r}
-dead_encounters <- inner_join(encounters, dead_patients, by = join_by(patient_durable_key == durable_key))
+dead_encounters <- inner_join(encounters, dead_patients, by = join_by(patient_durable_key == durable_key)) |>
+  inner_join(diagnosis, join_by(diagnosis))
 
+```
+
+```{r}
+encounters_patients <- inner_join(encounters, patients, by = join_by(patient_durable_key == durable_key))
 ```
 
 ```{r}
@@ -71,6 +84,21 @@ dead_encounters |> summarise(across(everything(), ~ sum(is.na(.)))) |>
 ```
 
 ```{r}
+diagnosis |> count(group_name)
+diagnosis |> count(diagnosis_key) |> arrange(desc(n))
 
+# Step 1 & 2: Count distinct B per A
+diagnosis_conflict <- diagnosis %>%
+  group_by(A) %>%
+  summarise(
+    n_B = n_distinct(B),          # number of unique B values
+    B_values = list(unique(B)),   # actual B values
+    .groups = "drop"
+  ) %>%
+  # Step 3: Keep only A values with more than 1 B
+  filter(n_B > 1)
+
+# View result
+df_multiple_B_values
 ```
 
