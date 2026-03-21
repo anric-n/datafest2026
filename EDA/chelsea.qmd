@@ -25,11 +25,27 @@ tigercensus <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/D
 
 # Census
 ```{r}
-ks_income <- get_acs(
-  geography = "county",   # Choose county as our geographic unit
-  variables = "B19013_001",  # P1_001N is the 2020 total population variable
+ks_income_tract <- get_acs(
+  geography = "tract",   # Choose county as our geographic unit
+  variables = "B19013_001", 
   state = "KS",         
   year = 2022)
+
+ks_income_tract_county <- get_acs(
+  geography = "county",   # Choose county as our geographic unit
+  variables = "B19013_001", 
+  state = "KS",         
+  year = 2022)
+
+ks_income_tract <- ks_income_tract |> 
+  mutate(
+  NAME = str_remove_all(NAME, ";"),
+  NAME = str_remove_all(NAME, "Census Tract"),
+  NAME = str_remove_all(NAME, "County"),
+  NAME = str_remove_all(NAME, "Kansas"),
+  NAME = str_squish(NAME)
+) %>% 
+  separate(NAME, into = c("tract", "county_name"), sep = " ")
 ```
 
 SVH only covers 19 counties
@@ -56,9 +72,6 @@ svh_counties <- c(
   Coffey = "20041",
   Douglas = "20061"
 )
-
-ks_income <- ks_income %>%
-  mutate(NAME = str_remove(NAME, " County, Kansas")) %>% 
-  filter(NAME %in% names(svh_counties))
 ```
+
 
