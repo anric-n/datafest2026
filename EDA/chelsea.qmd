@@ -57,7 +57,7 @@ svh_counties <- c(
   Douglas = "20061"
 )
 
-ks_income %>%
+ks_income <- ks_income %>%
   mutate(NAME = str_remove(NAME, " County, Kansas")) %>% 
   filter(NAME %in% names(svh_counties))
 ```
