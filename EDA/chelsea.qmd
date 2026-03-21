@@ -12,6 +12,7 @@ idk if eda is that useful for geospatial data
 #| message: FALSE
 library(tidyverse)
 library(tidycensus)
+library(tigris)
 
 departments <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/departments.csv") %>%  mutate(county = str_to_title(county), department_name = str_to_title(department_name))
 determinants <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/determinants.csv")
@@ -29,7 +30,8 @@ ks_income_tract <- get_acs(
   geography = "tract",   # Choose county as our geographic unit
   variables = "B19013_001", 
   state = "KS",         
-  year = 2022)
+  year = 2022,
+  geometry = TRUE)
 
 ks_income_tract_county <- get_acs(
   geography = "county",   # Choose county as our geographic unit
@@ -65,4 +67,22 @@ ks_income_tract <- svh_counties %>%
   left_join(ks_income_tract, by = join_by(county == county_name))
 ```
 
+
+```{r}
+#| message: FALSE
+kansas_tract <- tigris::tracts(state = "KS", year = 2024, progress_bar = FALSE) |> 
+  janitor::clean_names() 
+```
+
+```{r}
+ks_sf_income_tract <- ks_income_tract %>%
+  left_join(kansas_tract, by = c("GEOID" = "geoid")) %>% 
+  sf::st_as_sf()
+
+ggplot(ks_sf_income_tract) +
+  geom_sf(aes(fill = estimate), color = NA) +
+  scale_fill_viridis_c(name = "Median Household\nIncome ($)") +
+  theme_minimal() +
+  labs(title = "Median Household Income by Census Tract in Kansas")
+```
 

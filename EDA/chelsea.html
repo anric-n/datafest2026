@@ -108,14 +108,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'tidycensus' was built under R version 4.5.2</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>departments <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/departments.csv"</span>) <span class="sc">%&gt;%</span>  <span class="fu">mutate</span>(<span class="at">county =</span> <span class="fu">str_to_title</span>(county), <span class="at">department_name =</span> <span class="fu">str_to_title</span>(department_name))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>determinants <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/determinants.csv"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>diagnosis <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/diagnosis.csv"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>encounters <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/departments.csv"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/patients.csv"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>providers <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/providers.csv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">office_address =</span> <span class="fu">str_replace</span>(office_address, <span class="st">"CT"</span>, <span class="st">"Ct"</span>))</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>tigercensus <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/tigercensus.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tigris)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>departments <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/departments.csv"</span>) <span class="sc">%&gt;%</span>  <span class="fu">mutate</span>(<span class="at">county =</span> <span class="fu">str_to_title</span>(county), <span class="at">department_name =</span> <span class="fu">str_to_title</span>(department_name))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>determinants <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/determinants.csv"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>diagnosis <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/diagnosis.csv"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>encounters <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/departments.csv"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/patients.csv"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>providers <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/providers.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">office_address =</span> <span class="fu">str_replace</span>(office_address, <span class="st">"CT"</span>, <span class="st">"Ct"</span>))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>tigercensus <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/tigercensus.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="census" class="level1">
@@ -125,42 +127,135 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">geography =</span> <span class="st">"tract"</span>,   <span class="co"># Choose county as our geographic unit</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"B19013_001"</span>, </span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="st">"KS"</span>,         </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="dv">2022</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="dv">2022</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">geometry =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Getting data from the 2018-2022 5-year ACS</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ks_income_tract_county <span class="ot">&lt;-</span> <span class="fu">get_acs</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">geography =</span> <span class="st">"county"</span>,   <span class="co"># Choose county as our geographic unit</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"B19013_001"</span>, </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="st">"KS"</span>,         </span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="dv">2022</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Downloading feature geometry from the Census website.  To cache shapefiles for use in future sessions, set `options(tigris_use_cache = TRUE)`.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |===                                                                   |   4%
+  |                                                                            
+  |===                                                                   |   5%
+  |                                                                            
+  |======                                                                |   8%
+  |                                                                            
+  |=======                                                               |  10%
+  |                                                                            
+  |==========                                                            |  15%
+  |                                                                            
+  |=============                                                         |  19%
+  |                                                                            
+  |===============                                                       |  22%
+  |                                                                            
+  |==================                                                    |  26%
+  |                                                                            
+  |=====================                                                 |  29%
+  |                                                                            
+  |=====================                                                 |  30%
+  |                                                                            
+  |=======================                                               |  33%
+  |                                                                            
+  |=========================                                             |  36%
+  |                                                                            
+  |===========================                                           |  39%
+  |                                                                            
+  |============================                                          |  40%
+  |                                                                            
+  |==============================                                        |  43%
+  |                                                                            
+  |=================================                                     |  47%
+  |                                                                            
+  |===================================                                   |  50%
+  |                                                                            
+  |=====================================                                 |  53%
+  |                                                                            
+  |========================================                              |  57%
+  |                                                                            
+  |===========================================                           |  61%
+  |                                                                            
+  |=============================================                         |  65%
+  |                                                                            
+  |================================================                      |  68%
+  |                                                                            
+  |==================================================                    |  72%
+  |                                                                            
+  |=====================================================                 |  76%
+  |                                                                            
+  |========================================================              |  80%
+  |                                                                            
+  |==========================================================            |  83%
+  |                                                                            
+  |=============================================================         |  87%
+  |                                                                            
+  |================================================================      |  91%
+  |                                                                            
+  |==================================================================    |  94%
+  |                                                                            
+  |===================================================================== |  98%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ks_income_tract_county <span class="ot">&lt;-</span> <span class="fu">get_acs</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">geography =</span> <span class="st">"county"</span>,   <span class="co"># Choose county as our geographic unit</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"B19013_001"</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="st">"KS"</span>,         </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="dv">2022</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Getting data from the 2018-2022 5-year ACS</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ks_income_tract <span class="ot">&lt;-</span> ks_income_tract <span class="sc">|&gt;</span> </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_remove_all</span>(NAME, <span class="st">";"</span>),</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_remove_all</span>(NAME, <span class="st">"Census Tract"</span>),</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_remove_all</span>(NAME, <span class="st">"County"</span>),</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_remove_all</span>(NAME, <span class="st">"Kansas"</span>),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_squish</span>(NAME)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(NAME, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"tract"</span>, <span class="st">"county_name"</span>), <span class="at">sep =</span> <span class="st">" "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ks_income_tract <span class="ot">&lt;-</span> ks_income_tract <span class="sc">|&gt;</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_remove_all</span>(NAME, <span class="st">";"</span>),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_remove_all</span>(NAME, <span class="st">"Census Tract"</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_remove_all</span>(NAME, <span class="st">"County"</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_remove_all</span>(NAME, <span class="st">"Kansas"</span>),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">NAME =</span> <span class="fu">str_squish</span>(NAME)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(NAME, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"tract"</span>, <span class="st">"county_name"</span>), <span class="at">sep =</span> <span class="st">" "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>SVH only covers 19 counties</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>svh_counties <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">county =</span> <span class="fu">c</span>(<span class="st">"Shawnee"</span>, <span class="st">"Riley"</span>, <span class="st">"Geary"</span>, <span class="st">"Dickinson"</span>, <span class="st">"Clay"</span>, <span class="st">"Wabaunsee"</span>, </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Morris"</span>, <span class="st">"Pottawatomie"</span>, <span class="st">"Jefferson"</span>, <span class="st">"Atchison"</span>, <span class="st">"Jackson"</span>, </span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Nemaha"</span>, <span class="st">"Marshall"</span>, <span class="st">"Brown"</span>, <span class="st">"Lyon"</span>, <span class="st">"Franklin"</span>, <span class="st">"Osage"</span>, </span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Coffey"</span>, <span class="st">"Douglas"</span>),</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">fips =</span> <span class="fu">c</span>(<span class="st">"20177"</span>, <span class="st">"20161"</span>, <span class="st">"20085"</span>, <span class="st">"20057"</span>, <span class="st">"20029"</span>, <span class="st">"20207"</span>, <span class="st">"20129"</span>, </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>           <span class="st">"20149"</span>, <span class="st">"20103"</span>, <span class="st">"20015"</span>, <span class="st">"20099"</span>, <span class="st">"20135"</span>, <span class="st">"20121"</span>, <span class="st">"20021"</span>, </span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>           <span class="st">"20111"</span>, <span class="st">"20063"</span>, <span class="st">"20141"</span>, <span class="st">"20041"</span>, <span class="st">"20061"</span>)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>ks_income_tract <span class="ot">&lt;-</span> svh_counties <span class="sc">%&gt;%</span> </span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(ks_income_tract, <span class="at">by =</span> <span class="fu">join_by</span>(county <span class="sc">==</span> county_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>svh_counties <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">county =</span> <span class="fu">c</span>(<span class="st">"Shawnee"</span>, <span class="st">"Riley"</span>, <span class="st">"Geary"</span>, <span class="st">"Dickinson"</span>, <span class="st">"Clay"</span>, <span class="st">"Wabaunsee"</span>, </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Morris"</span>, <span class="st">"Pottawatomie"</span>, <span class="st">"Jefferson"</span>, <span class="st">"Atchison"</span>, <span class="st">"Jackson"</span>, </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Nemaha"</span>, <span class="st">"Marshall"</span>, <span class="st">"Brown"</span>, <span class="st">"Lyon"</span>, <span class="st">"Franklin"</span>, <span class="st">"Osage"</span>, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Coffey"</span>, <span class="st">"Douglas"</span>),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">fips =</span> <span class="fu">c</span>(<span class="st">"20177"</span>, <span class="st">"20161"</span>, <span class="st">"20085"</span>, <span class="st">"20057"</span>, <span class="st">"20029"</span>, <span class="st">"20207"</span>, <span class="st">"20129"</span>, </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>           <span class="st">"20149"</span>, <span class="st">"20103"</span>, <span class="st">"20015"</span>, <span class="st">"20099"</span>, <span class="st">"20135"</span>, <span class="st">"20121"</span>, <span class="st">"20021"</span>, </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>           <span class="st">"20111"</span>, <span class="st">"20063"</span>, <span class="st">"20141"</span>, <span class="st">"20041"</span>, <span class="st">"20061"</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>ks_income_tract <span class="ot">&lt;-</span> svh_counties <span class="sc">%&gt;%</span> </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(ks_income_tract, <span class="at">by =</span> <span class="fu">join_by</span>(county <span class="sc">==</span> county_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kansas_tract <span class="ot">&lt;-</span> tigris<span class="sc">::</span><span class="fu">tracts</span>(<span class="at">state =</span> <span class="st">"KS"</span>, <span class="at">year =</span> <span class="dv">2024</span>, <span class="at">progress_bar =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ks_sf_income_tract <span class="ot">&lt;-</span> ks_income_tract <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(kansas_tract, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"GEOID"</span> <span class="ot">=</span> <span class="st">"geoid"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_as_sf</span>()</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ks_sf_income_tract) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> estimate), <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Median Household</span><span class="sc">\n</span><span class="st">Income ($)"</span>) <span class="sc">+</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Household Income by Census Tract in Kansas"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="chelsea_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 </section>
 
