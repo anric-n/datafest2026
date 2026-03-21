@@ -73,12 +73,14 @@ tigercensus <- clean_df(tigercensus_raw)
 ```{r}
 #| label: read-clean-dfs
 
-departments <- read_csv(departments, "../../Clean-Data/departments.csv")
-determinants <- read_csv(determinants, "../../Clean-Data/determinants.csv")
-diagnosis <- read_csv(diagnosis, "../../Clean-Data/diagnosis.csv")
-encounters <- read_csv(encounters, "../../Clean-Data/encounters.csv")
-patients <- read_csv(patients, "../../Clean-Data/patients.csv")
-providers <- read_csv(providers, "../../Clean-Data/providers.csv")
-tigercensus <- read_csv(tigercensus, "../../Clean-Data/tigercensus.csv")
+departments <- read_csv("../Clean-Data/departments.csv") |>
+  mutate(county = str_to_title(county), department_name = str_to_title(department_name))
+determinants <- read_csv( "../Clean-Data/determinants.csv")
+diagnosis <- read_csv("../Clean-Data/diagnosis.csv")
+encounters <- read_csv("../Clean-Data/encounters.csv") 
+patients <- read_csv("../Clean-Data/patients.csv")
+providers <- read_csv("../Clean-Data/providers.csv") |>
+  mutate(office_address = str_replace(office_address, "CT", "Ct"))
+tigercensus <- read_csv("../Clean-Data/tigercensus.csv")
 ```
 
