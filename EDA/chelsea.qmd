@@ -5,36 +5,60 @@ format: html
 # Tiger Census
 idk if eda is that useful for geospatial data 
 
-```{r}
-library(readr)
-library(ggplot2)
-library(dplyr)
-tigercensus <- read_csv('~/data/2026-ASA-DataFest-Data-Files/tigercensuscodes.csv',show_col_types = FALSE)
-determinants <- read_csv('~/data/2026-ASA-DataFest-Data-Files/social_determinants.csv',show_col_types = FALSE)
-providers <- read_csv('~/data/2026-ASA-DataFest-Data-Files/providers.csv',show_col_types = FALSE)
-patients <- read_csv('~/data/2026-ASA-DataFest-Data-Files/patients.csv',show_col_types = FALSE)
-encounters <- read_csv('~/data/2026-ASA-DataFest-Data-Files/encounters.csv',show_col_types = FALSE)
-diagnosis <- read_csv('~/data/2026-ASA-DataFest-Data-Files/diagnosis.csv',show_col_types = FALSE)
-departments<- read_csv('~/data/2026-ASA-DataFest-Data-Files/departments.csv',show_col_types = FALSE)
+# 3/21 : loading cleaned data
 
-tigercensus |> 
-  dplyr::summarize(max = max(PopulationValue, na.rm = TRUE),
-            min = min(PopulationValue, na.rm = TRUE),
-            median = median(PopulationValue, na.rm = TRUE))
-
-ggplot(tigercensus, aes(x = PopulationValue)) +
-  geom_boxplot()
-```
-# Diagnosis
 ```{r}
-str(diagnosis)
-diagnosis_groups <- as_tibble(unique(diagnosis$GroupName))
+#| label: read-clean-dfs
+#| message: FALSE
+library(tidyverse)
+library(tidycensus)
+
+departments <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/departments.csv") %>%  mutate(county = str_to_title(county), department_name = str_to_title(department_name))
+determinants <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/determinants.csv")
+diagnosis <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/diagnosis.csv")
+encounters <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/departments.csv")
+patients <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/patients.csv")
+providers <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/providers.csv") %>% 
+  mutate(office_address = str_replace(office_address, "CT", "Ct"))
+tigercensus <- read_csv("~/chelseanathan0608@gmail.com - Google Drive/My Drive/Datafest/Clean-Data/tigercensus.csv")
 ```
 
-# Encounters
+# Census
 ```{r}
-unique(encounters$Type) # 18 types
-unique(encounters$VisitTypeDescription)
-unique(determinants$DisplayName)
+ks_income <- get_acs(
+  geography = "county",   # Choose county as our geographic unit
+  variables = "B19013_001",  # P1_001N is the 2020 total population variable
+  state = "KS",         
+  year = 2022)
+```
+
+SVH only covers 19 counties
+
+```{r}
+svh_counties <- c(
+  Shawnee = "20177",
+  Riley = "20161",
+  Geary = "20085",
+  Dickinson = "20057",
+  Clay = "20029",
+  Wabaunsee = "20207",
+  Morris = "20129",
+  Pottawatomie = "20149",
+  Jefferson = "20103",
+  Atchison = "20015",
+  Jackson = "20099",
+  Nemaha = "20135",
+  Marshall = "20121",
+  Brown = "20021",
+  Lyon = "20111",
+  Franklin = "20063",
+  Osage = "20141",
+  Coffey = "20041",
+  Douglas = "20061"
+)
+
+ks_income %>%
+  mutate(NAME = str_remove(NAME, " County, Kansas")) %>% 
+  filter(NAME %in% names(svh_counties))
 ```
 
