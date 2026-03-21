@@ -46,3 +46,31 @@ ggplot(dead_patients, aes(x = patient_birth_year_bin)) +
   scale_y_log10()
 ```
 
+
+```{r}
+head(encounters, n = 10)
+```
+
+```{r}
+dead_encounters <- inner_join(encounters, dead_patients, by = join_by(patient_durable_key == durable_key))
+
+```
+
+```{r}
+  select(date, department_key, encounter_key, 
+         patient_durable_key, type, visit_type, provider_durable_key,    )
+```
+
+```{r}
+
+dead_encounters |> summarise(across(everything(), ~ sum(is.na(.)))) |>
+  pivot_longer(everything(), names_to = "column", values_to = "count") |>
+  arrange(desc(count)) |>
+  kable()
+
+```
+
+```{r}
+
+```
+
