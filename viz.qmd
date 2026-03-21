@@ -1,0 +1,135 @@
+---
+title: "viz"
+format: html
+---
+
+```{r}
+#| label: libraries
+
+library(tidyverse)
+library(tigris)
+library(sf)
+library(ggthemes)
+library(scales)
+library(colorspace)
+```
+
+```{r}
+#| label: read-in-data
+
+file_path_header <- "~/Downloads/datafest2026/Clean-Data"
+
+departments <- read_csv(file.path(file_path_header, "departments.csv")) |>
+  mutate(county = str_to_title(county), department_name = str_to_title(department_name))
+determinants <- read_csv(file.path(file_path_header, "determinants.csv"))
+diagnosis <- read_csv(file.path(file_path_header, "diagnosis.csv"))
+encounters <- read_csv(file.path(file_path_header, "encounters.csv"))
+patients <- read_csv(file.path(file_path_header, "patients.csv"))
+providers <- read_csv(file.path(file_path_header, "providers.csv")) |> 
+  mutate(office_address = str_replace(office_address, "CT", "Ct"))
+tigercensus <- read_csv(file.path(file_path_header, "tigercensus.csv"))
+```
+
+
+
+```{r}
+#| label: get-ks-shapefile
+#| cache: true
+
+kansas_county <- counties(state = "KS", year = 2024, progress_bar = FALSE) |> 
+  janitor::clean_names()
+
+kansas_tract <- tracts(state = "KS", year = 2024, progress_bar = FALSE) |> 
+  janitor::clean_names()
+
+#kansas_zip <- zctas(state = "KS", year = 2010, progress_bar = FALSE) |> 
+#  janitor::clean_names()
+```
+
+```{r}
+#| label: mutate-props-virtual-data
+
+#so postal_code = zip_code
+
+#proposed viz: map of kansas, specifically northeast if possible
+#county lines, plot a point for each SVH location, then shade each county by the number of virtual visits and in person visits - might have to be more granular tbh because it's lowkey too granular
+
+#departments has tract variable
+encounters_patients <- left_join(encounters, patients,
+  by = join_by(patient_durable_key == durable_key)) |>
+  mutate(is_virtual_visit = str_detect(visit_type_description, "Virtual"), 
+         .before = is_ed_visit) |>
+  left_join(departments, by = join_by(department_key))
+
+virtual_visit_tract <- encounters_patients |>
+  group_by(census_tract) |>
+  drop_na(census_tract) |>
+  summarize(pct_visit_tract = mean(is_virtual_visit, na.rm = TRUE)) |>
+  mutate(census_tract = as.character(census_tract))
+
+virtual_visit_county <- encounters_patients |>
+  mutate(county_code = substr(census_tract, 3, 5)) |>
+  group_by(county_code) |>
+  summarize(pct_visit_county = mean(is_virtual_visit, na.rm = TRUE)) |>
+  drop_na(county_code)
+
+kansas_tract_virtual <- kansas_tract |>
+  left_join(virtual_visit_tract, by = join_by(geoid == census_tract), relationship = "many-to-one") |>
+  left_join(virtual_visit_county, by = join_by(countyfp == county_code), relationship = "many-to-one") |>
+  filter(countyfp %in% virtual_visit_county$county_code)
+
+kansas_county_virtual <- kansas_county |> 
+  filter(countyfp %in% virtual_visit_county$county_code) |>
+  left_join(virtual_visit_county, by = join_by(countyfp == county_code), relationship = "many-to-one")
+```
+
+```{r}
+svh_counties <- c(
+  Shawnee = "20177",
+  Riley = "20161",
+  Geary = "20085",
+  Dickinson = "20057",
+  Clay = "20029",
+  Wabaunsee = "20207",
+  Morris = "20129",
+  Pottawatomie = "20149",
+  Jefferson = "20103",
+  Atchinson = "20015",
+  Jackson = "20099",
+  Nemaha = "20135",
+  Marshall = "20121",
+  Brown = "20021",
+  Lyon = "20111",
+  Franklin = "20063",
+  Osage = "20141",
+  Coffey = "20041",
+  Douglas = "20061"
+)
+```
+
+```{r}
+#| label: plot-tract-version
+
+  ggplot() +
+  #graph tracts with aes(fill) prop of virtual visits
+  geom_sf(data = kansas_tract_virtual, aes(fill = pct_visit_tract)) +
+  #graph points of hospitals
+  geom_sf(data = kansas_county_virtual, fill = NA, aes(color = pct_visit_county), linewidth = 1) +
+  scale_fill_viridis_c() +
+  theme_minimal() #+
+  #insert manual diverging color scale here blue = #3B8794 yellow = #E8B447
+  #scale_fill_continuous_divergingx(palette = 'RdBu', mid = 0.5) +
+  
+```
+
+```{r}
+#| label: plot-county-version
+
+ggplot(kansas_county) +
+  #graph tracts with aes(fill) prop of virtual visits
+  geom_sf() +
+  #graph points of hospitals
+  geom_sf() +
+  theme_minimal() #+
+  #insert manual diverging color scale here blue = #3B8794 yellow = #E8B447
+```
