@@ -40,11 +40,7 @@ ggplot(patients, aes(x = "", fill = vital_status)) +
 block_group <- patients |>
   count(census_block_group_fips_code)
 ```
-```{r}
-unique(patients$my_chart_status)
-patients |>
-  filter(is.na(patients$my_chart_status))
-```
+
 
 
 ```{r}
@@ -69,10 +65,6 @@ virtual_patients <- virtual |>
     patient_durable_key, census_block_group_fips_code:patient_birth_year_bin) |>
   distinct()
 
-```
-```{r}
-virtual_patients |>
-  filter(is.na(patients$my_chart_status))
 ```
 
 
@@ -110,13 +102,6 @@ diagnosis_conflict <- virtual_diagnosis |>
 
 ```
 
-```{r}
-virtual <- virtual |>
-  left_join(virtual_diagnosis, 
-    by = join_by("diagnosis_key" = "primary_diagnosis_key"),
-    
-  )
-```
 
 # patient demographics:
 
@@ -277,3 +262,9 @@ ggplot(dead_patients, aes(x = patient_birth_year_bin)) +
   geom_bar() +
   scale_y_log10()
 ```
+
+
+```{r}
+
+```
+

@@ -1,0 +1,61 @@
+---
+title: "modeling"
+format: html
+---
+```{r}
+library(broom)
+library(knitr)
+library(tidyverse)
+```
+
+```{r}
+encounters_patients <- left_join(encounters, patients,
+  by = join_by(patient_durable_key == durable_key))
+```
+
+```{r}
+# add median tract household income to encounters
+# add dummy variable to encounters
+encounters_patients <- encounters_patients |>
+  mutate(
+    is_virtual = case_when(
+      visit_type_description == "Clinic Visits- Virtual" ~ 1,
+      visit_type_description == "Virtual Visits" ~ 1,
+      visit_type_description == "Clinic Visit- Virtual" ~ 1,
+      .default = 0
+    )
+  ) 
+  
+encounters_patients <- enconters_patients |>
+  mutate(census_block_group_fips_code = substr(census_block_group_fips_code, 1, 11)) |>
+  rename(tract_code = census_block_group_fips_code) |>
+  left_join(ks_income_tract |> select(GEOID, estimate), by = join_by(tract_code == GEOID)) 
+
+```
+
+
+```{r}
+hh_fit = glm(is_virtual ~ estimate, 
+                         data  = encounters_patients, 
+                         family = "binomial")
+summary(hh_fit)
+```
+
+
+
+```{r}
+encounters_patients |> mutate()
+
+hh_fit = glm(is_virtual ~ estimate, 
+                         data  = encounters_patients, 
+                         family = "binomial")
+
+```
+
+```{r}
+tidy(hh_fit) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3))) |>
+  kable(col.names = c("Term", "Estimate", "Std. Error", "Statistic", "P-value"))
+```
+
+
