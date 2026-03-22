@@ -14,6 +14,7 @@ library(tidyverse)
 ```{r}
 encounters <- read_csv("../encounters.csv") 
 patients <- read_csv("../patients.csv")
+
 ```
 
 ```{r}
@@ -54,5 +55,55 @@ tidy(hh_fit) |>
   kable(col.names = c("Term", "Estimate", "Std. Error", "Statistic", "P-value"))
 ```
 
+```{r}
+diagnosis <- read_csv("../diagnosis.csv")
+```
+
+
+```{r}
+# isolate diagnosis keys from virtual
+# isolate diagnosis keys and group names from diagnosis
+# join
+
+diag_slice <- diagnosis |> select(diagnosis_key, group_name) |> distinct()
+
+
+
+encounters_diagnosis <- left_join(encounters_patients, diag_slice, 
+  by = c("primary_diagnosis_key" = "diagnosis_key"),
+  relationship = "many-to-many", multiple = "all") |>
+  relevel(encounters_diagnosis$first_race, ref = "White or Caucasian")
+
+
+
+```
+
+```{r}
+encounters_ed <- encounters_diagnosis |>
+  filter(group_name == "Eating disorders")
+
+encounters_gen <- encounters_diagnosis |>
+  filter(group_name == "Encounter for general examination without complaint, suspected or reported diagnosis")
+```
+
+
+```{r}
+hh_fit_ed = glm(is_virtual ~ estimate + patient_birth_year_bin + first_race, 
+                         data  = encounters_ed, 
+                         family = "binomial")
+summary(hh_fit_ed)
+
+```
+
+```{r}
+
+hh_fit_gen = glm(is_virtual ~ estimate + patient_birth_year_bin + first_race, 
+                         data  = encounters_gen, 
+                         family = "binomial")
+summary(hh_fit_gen)
+
+tidy(hh_fit_gen) |>
+  kable(col.names = c("Term", "Estimate", "Std. Error", "Statistic", "P-value"))
+```
 
 
