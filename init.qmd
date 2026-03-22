@@ -109,14 +109,14 @@ ks_income_tract <- ks_income_tract |>
 SVH only covers 19 counties
 
 ```{r}
-svh_counties <- tibble(
+svh_counties <- data.frame(
   county = c("Shawnee", "Riley", "Geary", "Dickinson", "Clay", "Wabaunsee", 
              "Morris", "Pottawatomie", "Jefferson", "Atchison", "Jackson", 
              "Nemaha", "Marshall", "Brown", "Lyon", "Franklin", "Osage", 
              "Coffey", "Douglas"),
-  fips = c("20177", "20161", "20085", "20057", "20029", "20207", "20129", 
-           "20149", "20103", "20015", "20099", "20135", "20121", "20021", 
-           "20111", "20063", "20141", "20041", "20061")
+  fips = c("177", "161", "085", "057", "029", "207", "129", 
+           "149", "103", "015", "099", "135", "121", "021", 
+           "111", "063", "141", "041", "061")
 )
 
 ks_income_tract <- svh_counties %>% 
