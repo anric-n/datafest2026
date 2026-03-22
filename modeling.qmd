@@ -8,6 +8,7 @@ assumes you have everything from anric.qmd, init.qmd
 library(broom)
 library(knitr)
 library(tidyverse)
+library(tidycensus)
 ```
 
 
@@ -16,6 +17,44 @@ encounters <- read_csv("../encounters.csv")
 patients <- read_csv("../patients.csv")
 
 ```
+
+# Census Median Household income
+```{r}
+ks_income_tract <- get_acs(
+  geography = "tract",   # Choose county as our geographic unit
+  geometry = TRUE,
+  variables = "B19013_001", 
+  state = "KS",         
+  year = 2022,)
+
+ks_income_tract <- ks_income_tract |> 
+  mutate(
+  NAME = str_remove_all(NAME, ";"),
+  NAME = str_remove_all(NAME, "Census Tract"),
+  NAME = str_remove_all(NAME, "County"),
+  NAME = str_remove_all(NAME, "Kansas"),
+  NAME = str_squish(NAME)
+) %>% 
+  separate(NAME, into = c("tract", "county_name"), sep = " ")
+```
+
+SVH only covers 19 counties
+
+```{r}
+svh_counties <- data.frame(
+  county = c("Shawnee", "Riley", "Geary", "Dickinson", "Clay", "Wabaunsee", 
+             "Morris", "Pottawatomie", "Jefferson", "Atchison", "Jackson", 
+             "Nemaha", "Marshall", "Brown", "Lyon", "Franklin", "Osage", 
+             "Coffey", "Douglas"),
+  fips = c("177", "161", "085", "057", "029", "207", "129", 
+           "149", "103", "015", "099", "135", "121", "021", 
+           "111", "063", "141", "041", "061")
+)
+
+ks_income_tract <- svh_counties %>% 
+  left_join(ks_income_tract, by = join_by(county == county_name))
+```
+
 
 ```{r}
 encounters_patients <- left_join(encounters, patients,
@@ -71,12 +110,14 @@ diag_slice <- diagnosis |> select(diagnosis_key, group_name) |> distinct()
 
 encounters_diagnosis <- left_join(encounters_patients, diag_slice, 
   by = c("primary_diagnosis_key" = "diagnosis_key"),
-  relationship = "many-to-many", multiple = "all") |>
-  relevel(encounters_diagnosis$first_race, ref = "White or Caucasian")
-
-
-
+  relationship = "many-to-many", multiple = "all") 
 ```
+
+```{r}
+encounters_patients <- encounters_patients |>
+  mutate(my_chart_status = if_else(is.na(my_chart_status), "Unknown", my_chart_status))
+```
+
 
 ```{r}
 encounters_ed <- encounters_diagnosis |>
@@ -88,7 +129,7 @@ encounters_gen <- encounters_diagnosis |>
 
 
 ```{r}
-hh_fit_ed = glm(is_virtual ~ estimate + patient_birth_year_bin + first_race, 
+hh_fit_ed = glm(is_virtual ~ estimate * patient_birth_year_bin, 
                          data  = encounters_ed, 
                          family = "binomial")
 summary(hh_fit_ed)
@@ -97,7 +138,7 @@ summary(hh_fit_ed)
 
 ```{r}
 
-hh_fit_gen = glm(is_virtual ~ estimate + patient_birth_year_bin + first_race, 
+hh_fit_gen = glm(is_virtual ~ estimate * patient_birth_year_bin, 
                          data  = encounters_gen, 
                          family = "binomial")
 summary(hh_fit_gen)
