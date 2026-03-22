@@ -2,10 +2,18 @@
 title: "modeling"
 format: html
 ---
+
+assumes you have everything from anric.qmd, init.qmd
 ```{r}
 library(broom)
 library(knitr)
 library(tidyverse)
+```
+
+
+```{r}
+encounters <- read_csv("../encounters.csv") 
+patients <- read_csv("../patients.csv")
 ```
 
 ```{r}
@@ -26,7 +34,7 @@ encounters_patients <- encounters_patients |>
     )
   ) 
   
-encounters_patients <- enconters_patients |>
+encounters_patients <- encounters_patients |>
   mutate(census_block_group_fips_code = substr(census_block_group_fips_code, 1, 11)) |>
   rename(tract_code = census_block_group_fips_code) |>
   left_join(ks_income_tract |> select(GEOID, estimate), by = join_by(tract_code == GEOID)) 
@@ -35,27 +43,16 @@ encounters_patients <- enconters_patients |>
 
 
 ```{r}
-hh_fit = glm(is_virtual ~ estimate, 
+hh_fit = glm(is_virtual ~ estimate + patient_birth_year_bin, 
                          data  = encounters_patients, 
                          family = "binomial")
 summary(hh_fit)
 ```
 
-
-
-```{r}
-encounters_patients |> mutate()
-
-hh_fit = glm(is_virtual ~ estimate, 
-                         data  = encounters_patients, 
-                         family = "binomial")
-
-```
-
 ```{r}
 tidy(hh_fit) |>
-  mutate(across(where(is.numeric), \(x) round(x, 3))) |>
   kable(col.names = c("Term", "Estimate", "Std. Error", "Statistic", "P-value"))
 ```
+
 
 
