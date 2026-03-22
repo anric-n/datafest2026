@@ -62,7 +62,7 @@ virtual <- encounters_patients |>
 
 virtual_patients <- virtual |>
   select(
-    patient_durable_key, census_block_group_fips_code:patient_birth_year_bin) |>
+    patient_durable_key, first_race:patient_birth_year_bin) |>
   distinct()
 
 ```
@@ -198,7 +198,15 @@ group_name_stat <- count(diagnosis_stats, group_name) |>
 
 # age
 older patients are more likely to have virtual appointments?
+
+```{r}
+virtual_patients |>
+  semi_join(patients, by = join_by(patient_durable_key = durable_key)
+```
+
 ```{r patients-vis}
+
+
 ggplot(virtual_patients, aes(x = patient_birth_year_bin)) +
   geom_histogram() + 
   labs(title = "virtual patients")
@@ -265,6 +273,29 @@ ggplot(dead_patients, aes(x = patient_birth_year_bin)) +
 
 
 ```{r}
+# Add a 'group' column to each data frame, then combine
+virtual_patients$group <- "Virtual patients"
+patients$group <- "In person patients"
+
+combined <- rbind(
+  virtual_patients[, c("patient_birth_year_bin", "group")],
+  patients[, c("patient_birth_year_bin", "group")]
+)
+
+
+```
+
+```{r}
+ggplot(combined, aes(x = patient_birth_year_bin, fill = group)) +
+  geom_histogram(position = "identity") +
+  scale_fill_manual(values = c("In person patients" = "steelblue", "Virtual patients" = "coral")) +
+  labs(
+    title = "Patients by encounter type",
+    x = "Patient birth year bin",
+    y = "Count (square rooted)",
+    fill = NULL
+  ) +  scale_y_continuous(trans = "sqrt") +  theme_minimal() +
+  theme(legend.position = "top")
 
 ```
 
