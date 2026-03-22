@@ -134,13 +134,18 @@ kansas_tract <- tigris::tracts(state = "KS", year = 2024, progress_bar = FALSE) 
 # Median HH income geospatial plot
 
 ```{r}
+
 ks_sf_income_tract <- ks_income_tract %>%
-  left_join(kansas_tract, by = c("GEOID" = "geoid")) %>% 
-  sf::st_as_sf()
+  sf::st_as_sf() %>% 
+  st_join(kansas_tract)
 
 ggplot(ks_sf_income_tract) +
   geom_sf(aes(fill = estimate), color = NA) +
-  scale_fill_viridis_c(name = "Median Household\nIncome ($)") +
+  scale_fill_viridis_c(
+    name = "Median Household\nIncome ($)",
+    breaks = c(min(ks_sf_income_tract$estimate, na.rm = TRUE), 
+               max(ks_sf_income_tract$estimate, na.rm = TRUE))) +
   theme_minimal() +
-  labs(title = "Median Household Income by Census Tract in Kansas")
+  labs(title = "Median Household Income by Census Tract in Kansas") +
+  theme(legend.position = "bottom")
 ```
